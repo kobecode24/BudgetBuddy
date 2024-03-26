@@ -2,7 +2,6 @@
 
 
 namespace App\Http\Controllers;
-use Illuminate\Routing\Controller;
 use OpenApi\Annotations as OA;
 
 /**
@@ -14,6 +13,7 @@ use OpenApi\Annotations as OA;
 use App\Models\Expense;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+
 
 
 class ExpenseController extends Controller
@@ -110,7 +110,7 @@ class ExpenseController extends Controller
     public function show($id)
     {
         $expense = Auth::user()->expenses()->find($id);
-
+        $this->authorize('view', $expense);
         if (!$expense) {
             return response()->json(['message' => 'Not found'], 404);
         }
@@ -147,13 +147,14 @@ class ExpenseController extends Controller
      */
     public function update(Request $request, $id)
     {
+
         $request->validate([
             'amount' => 'sometimes|required|numeric',
             'description' => 'sometimes|required|string|max:255',
         ]);
 
         $expense = Auth::user()->expenses()->find($id);
-
+        $this->authorize('update', $expense);
         if (!$expense) {
             return response()->json(['message' => 'Not found'], 404);
         }
@@ -190,6 +191,7 @@ class ExpenseController extends Controller
     public function destroy($id)
     {
         $expense = Auth::user()->expenses()->find($id);
+        $this->authorize('delete', $expense);
 
         if (!$expense) {
             return response()->json(['message' => 'Not found'], 404);
